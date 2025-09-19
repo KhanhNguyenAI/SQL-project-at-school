@@ -1,0 +1,319 @@
+CREATE DATABASE student_management;
+
+https://claude.ai/public/artifacts/28419b46-c56b-4769-a694-8844a9a7c1d1
+
+students (1) ←→ (N) academic_records
+students (1) ←→ (N) financial_records
+students (1) ←→ (1) student_profiles
+students (N) ←→ (N) subjects (thông qua grade_details)
+subjects (1) ←→ (N) grade_details
+
+
+💰 Thông tin tài chính (Financial Info)
+
+tuition → 学費 (がくひ)
+scholarship → 奨学金 (しょうがくきん)
+payment → 支払い (しはらい)
+fee → 料金 (りょうきん)
+total → 合計 (ごうけい)
+
+📊 Thông tin hệ thống (System Info)
+
+id → 番号 (ばんごう)
+created_at → 作成日時 (さくせいにちじ)
+updated_at → 更新日時 (こうしんにちじ)
+status → 状態 (じょうたい)
+type → 種類 (しゅるい)
+
+💼 Thông tin nghề nghiệp (Career Info)
+
+skills → 能力 (のうりょく)
+aspirations → 希望 (きぼう)
+achievements → 実績 (じっせき)
+certifications → 資格 (しかく)
+experience → 経験 (けいけん)
+
+
+Thông tin cá nhân (Personal Info)
+
+name → 名前 (なまえ)
+full_name → 氏名 (しめい)
+first_name → 名 (めい)
+last_name → 姓 (せい)
+birth_date → 生年月日 (せいねんがっぴ)
+age → 年齢 (ねんれい)
+gender → 性別 (せいべつ)
+address → 住所 (じゅうしょ)
+phone → 電話番号 (でんわばんごう)
+email → メールアドレス
+
+
+
+| student_id | 学生ID（がくせいID） | Mã số học sinh, khóa chính |
+| full_name | 氏名（しめい） | Họ và tên đầy đủ |
+| birth_date | 生年月日（せいねんがっぴ） | Ngày sinh |
+| gender | 性別（せいべつ） | Giới tính |
+| address | 住所（じゅうしょ） | Địa chỉ |
+| email | メールアドレス | Email |
+| phone | 電話番号（でんわばんごう） | Số điện thoại |
+| class_name | クラス名（クラスめい） | Tên lớp |
+| major | 専攻（せんこう） | Chuyên ngành |
+| grade_level | 学年（がくねん） | Năm học (1–4) |
+| enrollment_date | 入学日（にゅうがくび） | Ngày nhập học |
+| status | 在学状況（ざいがくじょうきょう） | Tình trạng học tập |
+| created_at | 登録日時（とうろくにちじ） | Thời điểm tạo bản ghi |
+| updated_at | 更新日時（こうしんにちじ） | Thời điểm cập nhật bản ghi |
+| idx_student_name | 氏名インデックス | Index theo tên học sinh |
+| idx_student_grade | 学年インデックス | Index theo năm học |
+| idx_student_major | 専攻インデックス | Index theo chuyên ngành |
+
+
+
+CREATE TABLE students (
+    student_id INT PRIMARY KEY AUTO_INCREMENT,
+    full_name VARCHAR(100) NOT NULL,
+    birth_date DATE NOT NULL,
+    gender VARCHAR(10) NOT NULL,
+    address VARCHAR(255) ,
+    email VARCHAR(100) UNIQUE,
+    phone VARCHAR(20),
+    class_name VARCHAR(20),
+    major VARCHAR(50),
+    grade_level INT CHECK (grade_level BETWEEN 1 AND 4),
+    enrollment_date DATE,
+    status VARCHAR(40) DEFAULT '在学中',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_student_name (full_name),
+    INDEX idx_student_grade (grade_level),
+    INDEX idx_student_major (major)
+);
+
+| record_id           | 成績記録ID（せいせききろくID）         | Mã bản ghi điểm, khóa chính |
+| student_id          | 学生ID（がくせいID）                   | Mã số học sinh, liên kết với bảng students |
+| academic_year       | 学年度（がくねんど）                   | Năm học (dạng YYYY) |
+| semester            | 学期（がっき）                         | Học kỳ: 前期 (kỳ đầu), 後期 (kỳ sau), 通年 (cả năm) |
+
+| first_term_score    | 第1期成績（だいいっきせいせき）         | Điểm kiểm tra kỳ 1 |
+| second_term_score   | 第2期成績（だいにきせいせき）           | Điểm kiểm tra kỳ 2 |
+| third_term_score    | 第3期成績（だいさんきせいせき）         | Điểm kiểm tra kỳ 3 |
+| fourth_term_score   | 第4期成績（だいよんきせいせき）         | Điểm kiểm tra kỳ 4 |
+
+| overall_grade       | 総合成績（そうごうせいせき）            | Điểm tổng kết (tự động tính trung bình) |
+| attendance_status   | 出席状況（しゅっせきじょうきょう）      | Tình trạng đi học: 優秀, 良好, 普通, 要改善, 不良 |
+| achievements        | 実績（じっせき）                        | Thành tích, giải thưởng, hoạt động |
+
+| created_at          | 作成日時（さくせいにちじ）              | Thời điểm tạo bản ghi |
+| updated_at          | 更新日時（こうしんにちじ）              | Thời điểm cập nhật bản ghi |
+
+| FOREIGN KEY         | 外部キー（がいぶキー）                  | Liên kết với bảng students qua student_id |
+| UNIQUE KEY          | 一意キー（いちいキー）                  | Đảm bảo mỗi học sinh chỉ có 1 bản ghi mỗi năm học + học kỳ |
+| idx_academic_year   | 学年度インデックス                      | Index theo năm học |
+| idx_overall_grade   | 総合成績インデックス                    | Index theo điểm tổng kết |
+
+CREATE TABLE academic_records (
+    record_id INT PRIMARY KEY AUTO_INCREMENT,
+    student_id INT NOT NULL,
+    academic_year YEAR NOT NULL,
+    semester VARCHAR(20),
+
+    first_term_score DECIMAL(5,2) CHECK (first_term_score >= 0 AND first_term_score <= 100),
+    second_term_score DECIMAL(5,2) CHECK (second_term_score >= 0 AND second_term_score <= 100),
+    third_term_score DECIMAL(5,2) CHECK (third_term_score >= 0 AND third_term_score <= 100),
+    fourth_term_score DECIMAL(5,2) CHECK (fourth_term_score >= 0 AND fourth_term_score <= 100),
+
+    overall_grade DECIMAL(5,2) GENERATED ALWAYS AS (
+        (IFNULL(first_term_score, 0) + IFNULL(second_term_score, 0) +
+         IFNULL(third_term_score, 0) + IFNULL(fourth_term_score, 0)) / 4
+    ) STORED,
+
+    attendance_status ENUM('優秀', '良好', '普通', '要改善', '不良') DEFAULT '普通',
+    achievements TEXT,
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (student_id) REFERENCES students(student_id) ON DELETE CASCADE,
+    UNIQUE KEY unique_student_year_semester (student_id, academic_year, semester),
+    INDEX idx_academic_year (academic_year),
+    INDEX idx_overall_grade (overall_grade)
+);
+
+
+| finance_id           | 財務記録ID（ざいむきろくID）             | Mã bản ghi tài chính, khóa chính |
+| student_id           | 学生ID（がくせいID）                     | Mã số học sinh, liên kết với bảng students |
+| academic_year        | 学年度（がくねんど）                     | Năm học (dạng YYYY) |
+
+| first_year_tuition   | 第1年学費（だいいちねんがくひ）           | Học phí năm 1 |
+| second_year_tuition  | 第2年学費（だいにねんがくひ）             | Học phí năm 2 |
+| third_year_tuition   | 第3年学費（だいさんねんがくひ）           | Học phí năm 3 |
+| fourth_year_tuition  | 第4年学費（だいよんねんがくひ）           | Học phí năm 4 |
+
+| scholarship_amount   | 奨学金額（しょうがくきんがく）             | Số tiền học bổng |
+| total_tuition        | 総学費（そうがくひ）                       | Tổng học phí sau khi trừ học bổng (tự động tính) |
+
+| payment_status       | 支払い状況（しはらいじょうきょう）         | Trạng thái thanh toán: 未納, 一部納付, 完納, 免除 |
+| payment_date         | 支払日（しはらいび）                       | Ngày thanh toán |
+| notes                | 備考（びこう）                             | Ghi chú thêm |
+
+| created_at           | 作成日時（さくせいにちじ）                 | Thời điểm tạo bản ghi |
+| updated_at           | 更新日時（こうしんにちじ）                 | Thời điểm cập nhật bản ghi |
+
+| FOREIGN KEY          | 外部キー（がいぶキー）                     | Liên kết với bảng students qua student_id |
+| UNIQUE KEY           | 一意キー（いちいキー）                     | Đảm bảo mỗi học sinh chỉ có 1 bản ghi mỗi năm học |
+| idx_payment_status   | 支払い状況インデックス                     | Index theo trạng thái thanh toán |
+| idx_total_tuition    | 総学費インデックス                         | Index theo tổng học phí |
+
+CREATE TABLE financial_records (
+    finance_id INT PRIMARY KEY AUTO_INCREMENT,
+    student_id INT NOT NULL,
+    academic_year YEAR NOT NULL,
+
+    first_year_tuition DECIMAL(10,2) DEFAULT 0,
+    second_year_tuition DECIMAL(10,2) DEFAULT 0,
+    third_year_tuition DECIMAL(10,2) DEFAULT 0,
+    fourth_year_tuition DECIMAL(10,2) DEFAULT 0,
+
+    scholarship_amount DECIMAL(10,2) DEFAULT 0,
+
+    total_tuition DECIMAL(10,2) GENERATED ALWAYS AS (
+        first_year_tuition + second_year_tuition + third_year_tuition + fourth_year_tuition - scholarship_amount
+    ) STORED,
+
+    payment_status ENUM('未納', '一部納付', '完納', '免除') DEFAULT '未納',
+    payment_date DATE,
+    notes TEXT,
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (student_id) REFERENCES students(student_id) ON DELETE CASCADE,
+    UNIQUE KEY unique_student_finance_year (student_id, academic_year),
+    INDEX idx_payment_status (payment_status),
+    INDEX idx_total_tuition (total_tuition)
+);
+
+
+
+| profile_id             | プロファイルID（ぷろふぁいるID）         | Mã hồ sơ, khóa chính |
+| student_id             | 学生ID（がくせいID）                     | Mã số học sinh, liên kết với bảng students |
+| skills                 | スキル                                   | Kỹ năng chuyên môn hoặc mềm |
+| aspirations            | 希望（きぼう）                            | Nguyện vọng học tập hoặc nghề nghiệp |
+| certifications         | 資格（しかく）                            | Chứng chỉ đã đạt được |
+| languages              | 使用言語（しようげんご）                  | Ngôn ngữ sử dụng hoặc thành thạo |
+| hobbies                | 趣味（しゅみ）                            | Sở thích cá nhân |
+| career_goals           | キャリア目標（きゃりあもくひょう）        | Mục tiêu nghề nghiệp dài hạn |
+| profile_updated_date   | プロファイル更新日（こうしんび）          | Ngày cập nhật hồ sơ gần nhất |
+| created_at             | 作成日時（さくせいにちじ）                | Thời điểm tạo bản ghi |
+| updated_at             | 更新日時（こうしんにちじ）                | Thời điểm cập nhật bản ghi |
+| FOREIGN KEY            | 外部キー（がいぶキー）                    | Liên kết với bảng students qua student_id |
+| idx_profile_updated    | 更新日インデックス                        | Index theo ngày cập nhật hồ sơ |
+
+CREATE TABLE student_profiles (
+    profile_id INT PRIMARY KEY AUTO_INCREMENT,
+    student_id INT NOT NULL,
+
+    skills TEXT,
+    aspirations TEXT,
+
+    certifications TEXT,
+    languages VARCHAR(255),
+    hobbies TEXT,
+    career_goals TEXT,
+
+    profile_updated_date DATE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (student_id) REFERENCES students(student_id) ON DELETE CASCADE,
+    INDEX idx_profile_updated (profile_updated_date)x
+);
+
+
+| subject_id         | 科目ID（かもくID）                     | Mã môn học, khóa chính |
+| subject_code       | 科目コード（かもくコード）             | Mã định danh môn học (duy nhất) |
+| subject_name       | 科目名（かもくめい）                   | Tên môn học |
+| credits            | 単位数（たんいすう）                   | Số tín chỉ |
+| subject_type       | 科目区分（かもくくぶん）               | Loại môn học: 必修 (bắt buộc), 選択必修 (bắt buộc có chọn), 選択 (tự chọn) |
+| department         | 所属学科（しょぞくがっか）             | Khoa hoặc bộ môn phụ trách |
+| instructor         | 担当教員（たんとうきょういん）         | Giảng viên phụ trách |
+
+| created_at         | 作成日時（さくせいにちじ）             | Thời điểm tạo bản ghi |
+| updated_at         | 更新日時（こうしんにちじ）             | Thời điểm cập nhật bản ghi |
+
+| idx_subject_code   | 科目コードインデックス                 | Index theo mã môn học |
+| idx_subject_type   | 科目区分インデックス                   | Index theo loại môn học |
+
+CREATE TABLE subjects (
+    subject_id INT PRIMARY KEY AUTO_INCREMENT,
+    subject_code VARCHAR(20) UNIQUE NOT NULL,
+    subject_name VARCHAR(100) NOT NULL,
+    credits INT NOT NULL,
+    subject_type ENUM('必修', '選択必修', '選択') NOT NULL,
+    department VARCHAR(50),
+    instructor VARCHAR(100),
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    INDEX idx_subject_code (subject_code),
+    INDEX idx_subject_type (subject_type)
+);
+
+
+| grade_id                         | 成績ID（せいせきID）                     | Mã bản ghi điểm, khóa chính |
+| student_id                       | 学生ID（がくせいID）                     | Mã số học sinh, liên kết với bảng students |
+| subject_id                       | 科目ID（かもくID）                       | Mã môn học, liên kết với bảng subjects |
+| academic_year                    | 学年度（がくねんど）                     | Năm học (dạng YYYY) |
+| semester                         | 学期（がっき）                           | Học kỳ: 前期 (kỳ đầu), 後期 (kỳ sau), 通年 (cả năm) |
+
+| midterm_score                    | 中間試験点数（ちゅうかんしけんてんすう） | Điểm thi giữa kỳ |
+| final_score                      | 期末試験点数（きまつしけんてんすう）     | Điểm thi cuối kỳ |
+| assignment_score                 | 課題点数（かだいてんすう）               | Điểm bài tập |
+| attendance_score                 | 出席点数（しゅっせきてんすう）           | Điểm chuyên cần |
+
+| total_score                      | 総合点数（そうごうてんすう）             | Tổng điểm (tự động tính theo trọng số) |
+| letter_grade                     | 評価（ひょうか）                         | Điểm chữ: A+, A, B+, B, C+, C, D, F |
+| credits_earned                   | 取得単位（しゅとくたんい）               | Số tín chỉ đạt được |
+
+| created_at                       | 作成日時（さくせいにちじ）               | Thời điểm tạo bản ghi |
+| updated_at                       | 更新日時（こうしんにちじ）               | Thời điểm cập nhật bản ghi |
+
+| FOREIGN KEY (student_id)         | 外部キー：学生ID                         | Liên kết với bảng students |
+| FOREIGN KEY (subject_id)         | 外部キー：科目ID                         | Liên kết với bảng subjects |
+| UNIQUE KEY student+subject+year | 一意キー（いちいキー）                   | Đảm bảo mỗi học sinh chỉ có 1 bản ghi mỗi môn mỗi học kỳ |
+| idx_total_score                  | 総合点数インデックス                     | Index theo tổng điểm |
+| idx_letter_grade                 | 評価インデックス                         | Index theo điểm chữ |
+
+CREATE TABLE grade_details (
+    grade_id INT PRIMARY KEY AUTO_INCREMENT,
+    student_id INT NOT NULL,
+    subject_id INT NOT NULL,
+    academic_year YEAR NOT NULL,
+    semester ENUM('前期', '後期', '通年') NOT NULL,
+
+    midterm_score DECIMAL(5,2),
+    final_score DECIMAL(5,2),
+    assignment_score DECIMAL(5,2),
+    attendance_score DECIMAL(5,2),
+
+    total_score DECIMAL(5,2) GENERATED ALWAYS AS (
+        IFNULL(midterm_score, 0) * 0.3 +
+        IFNULL(final_score, 0) * 0.4 +
+        IFNULL(assignment_score, 0) * 0.2 +
+        IFNULL(attendance_score, 0) * 0.1
+    ) STORED,
+
+    letter_grade ENUM('A+', 'A', 'B+', 'B', 'C+', 'C', 'D', 'F'),
+    credits_earned INT DEFAULT 0,
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (student_id) REFERENCES students(student_id) ON DELETE CASCADE,
+    FOREIGN KEY (subject_id) REFERENCES subjects(subject_id) ON DELETE CASCADE,
+    UNIQUE KEY unique_student_subject_year_semester (student_id, subject_id, academic_year, semester),
+    INDEX idx_total_score (total_score),
+    INDEX idx_letter_grade (letter_grade)
+);
+

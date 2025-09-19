@@ -1,0 +1,33 @@
+INSERT INTO students (full_name, birth_date, gender, address, email, phone, class_name, major, grade_level) VALUES
+('田中太郎', '2002-04-15', '男性', '東京都渋谷区1-1-1', 'tanaka@example.com', '090-1234-5678', 'A班', '情報工学科', 2),
+('佐藤花子', '2001-08-22', '女性', '大阪府大阪市北区2-2-2', 'sato@example.com', '080-2345-6789', 'B班', '機械工学科', 3),
+('鈴木一郎', '2003-01-10', '男性', '愛知県名古屋市中区3-3-3', 'suzuki@example.com', '070-3456-7890', 'A班', '電気工学科', 1),
+('高橋美咲', '2000-12-05', '女性', '福岡県福岡市博多区4-4-4', 'takahashi@example.com', '090-4567-8901', 'C班', '情報工学科', 4);
+
+-- 科目データ
+INSERT INTO subjects (subject_code, subject_name, credits, subject_type, department, instructor) VALUES
+('CS101', 'プログラミング基礎', 4, '必修', '情報工学科', '山田教授'),
+('CS201', 'データ構造とアルゴリズム', 4, '必修', '情報工学科', '田村教授'),
+('EE101', '電気回路', 3, '必修', '電気工学科', '伊藤教授'),
+('ME101', '機械力学', 3, '必修', '機械工学科', '中村教授');
+
+-- 学業成績データ
+INSERT INTO academic_records (student_id, academic_year, semester, first_term_score, second_term_score, third_term_score, fourth_term_score, attendance_status, achievements) VALUES
+(1, 2024, '前期', 85.5, 78.0, 92.3, 88.7, '良好', 'プログラミングコンテスト入賞'),
+(2, 2024, '前期', 90.2, 85.6, 88.9, 91.3, '優秀', '学部代表、研究発表優秀賞'),
+(3, 2024, '前期', 75.8, 82.4, 79.1, 85.2, '普通', ''),
+(4, 2024, '前期', 95.5, 93.8, 96.2, 94.7, '優秀', '学年首席、論文コンテスト最優秀賞');
+
+-- 学費データ
+INSERT INTO financial_records (student_id, academic_year, first_year_tuition, second_year_tuition, third_year_tuition, fourth_year_tuition, scholarship_amount, payment_status) VALUES
+(1, 2024, 800000, 820000, 0, 0, 300000, '完納'),
+(2, 2024, 800000, 820000, 840000, 0, 500000, '完納'),
+(3, 2024, 800000, 0, 0, 0, 200000, '完納'),
+(4, 2024, 800000, 820000, 840000, 860000, 800000, '完納');
+
+-- 学生プロフィール
+INSERT INTO student_profiles (student_id, skills, aspirations, certifications, languages, career_goals) VALUES
+(1, 'Python, Java, データ分析, Web開発', 'AIエンジニアとして就職、大学院進学検討', '基本情報技術者', '英語(TOEIC 750)', 'AI/ML分野でのエキスパートを目指す'),
+(2, '機械設計, CAD, 3Dモデリング', '自動車業界への就職', '機械設計技術者3級', '英語(TOEIC 680)', '自動運転技術の開発に携わりたい'),
+(3, '電気回路設計, マイコン制御', '電子機器メーカーへの就職', '第二種電気工事士', '英語(TOEIC 550)', 'IoTデバイスの開発エンジニア'),
+(4, 'フルスタック開発, プロジェクト管理, UI/UXデザイン', '外資系IT企業への就職', 'PMP, AWS Solutions Architect', '英語(TOEIC 920), 中国語(HSK6級)', 'グローバルなテックリーダーを目指す');
